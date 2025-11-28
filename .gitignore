@@ -1,0 +1,20 @@
+# Environments
+.env
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Distribution
+build/
+dist/
+*.egg-info/
+
+# Project specific
+temp/
+output/
+*.mp4
+*.mp3
+*.wav

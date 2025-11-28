@@ -1,0 +1,8 @@
+yt-dlp
+moviepy
+demucs
+lyricsgenius
+openai
+pyphen
+rich
+python-dotenv

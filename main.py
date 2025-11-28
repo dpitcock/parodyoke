@@ -11,6 +11,7 @@ from downloader import download_video, parse_srt
 from audio_processor import extract_audio, separate_vocals
 from lyrics_engine import fetch_lyrics, generate_parody, count_syllables
 from renderer import render_video
+from metadata import clean_youtube_title, parse_artist_title, format_output_filename
 
 console = Console()
 
@@ -18,10 +19,12 @@ def main():
     parser = argparse.ArgumentParser(description="Parody Karaoke Video Generator")
     parser.add_argument("url", help="YouTube URL of the karaoke video")
     parser.add_argument("--topic", help="Topic for parody lyrics", default="coding")
-    parser.add_argument("--output", help="Output filename", default="parody_karaoke.mp4")
+    parser.add_argument("--output", help="Output filename (optional, overrides auto-naming)", default=None)
     parser.add_argument("--skip-download", help="Skip download if files exist", action="store_true")
     parser.add_argument("--parody-file", help="Path to a text file containing parody lyrics (one line per subtitle block)")
     parser.add_argument("--original-file", help="Path to a text file containing original lyrics (for generation context)")
+    parser.add_argument("--author", help="Name of the parody author", default="AI")
+    parser.add_argument("--parody-title", help="Title of the parody song (if not provided, AI will generate one)")
     args = parser.parse_args()
 
     console.print(f"[bold green]Starting Parodyoke[/bold green]")
@@ -47,7 +50,7 @@ def main():
                  # yt-dlp checks existence.
                  pass
             
-            video_path, srt_path = download_video(args.url, temp_dir)
+            video_path, srt_path, raw_title = download_video(args.url, temp_dir)
             if not video_path:
                 console.print("[red]Failed to download video.[/red]")
                 return
@@ -112,7 +115,11 @@ def main():
                         original_lines = [text for _, _, text in parsed_subs]
                     
                     console.print("[blue]Generating parody lyrics with AI...[/blue]")
-                    parody_lines = generate_parody(original_lines, args.topic)
+                    generated_title, parody_lines = generate_parody(original_lines, args.topic)
+                    
+                    if not args.parody_title:
+                        args.parody_title = generated_title
+                        console.print(f"[green]Generated Title:[/green] {args.parody_title}")
 
                 # Align
                 # Warning if counts mismatch
@@ -136,8 +143,21 @@ def main():
             if not lyrics_data:
                 console.print("[yellow]No lyrics data to render. Creating instrumental video only.[/yellow]")
             
-            render_video(video_path, instrumental_path, lyrics_data, args.output)
-            console.print(f"[bold green]Done! Saved to {args.output}[/bold green]")
+            # Determine final filename
+            if args.output:
+                final_output = args.output
+            else:
+                # Parse original metadata
+                clean_title = clean_youtube_title(raw_title)
+                orig_artist, orig_title = parse_artist_title(clean_title)
+                
+                # Use provided parody title or default if not generated/provided
+                parody_title = args.parody_title if args.parody_title else f"Parody of {orig_title}"
+                
+                final_output = format_output_filename(args.author, parody_title, orig_artist, orig_title)
+                
+            render_video(video_path, instrumental_path, lyrics_data, final_output)
+            console.print(f"[bold green]Done! Saved to {final_output}[/bold green]")
         except Exception as e:
             console.print(f"[red]Rendering error:[/red] {e}")
             if "convert" in str(e) or "ImageMagick" in str(e):

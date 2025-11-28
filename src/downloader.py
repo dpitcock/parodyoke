@@ -3,10 +3,10 @@ import yt_dlp
 import re
 from typing import List, Tuple, Optional
 
-def download_video(url: str, output_dir: str = "temp") -> Tuple[Optional[str], Optional[str]]:
+def download_video(url: str, output_dir: str = "temp") -> Tuple[Optional[str], Optional[str], str]:
     """
     Downloads video and subtitles from YouTube.
-    Returns a tuple of (video_path, subtitle_path).
+    Returns a tuple of (video_path, subtitle_path, video_title).
     """
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -39,7 +39,7 @@ def download_video(url: str, output_dir: str = "temp") -> Tuple[Optional[str], O
              # For now, return None if not found
              subtitle_path = None
 
-        return filename, subtitle_path
+        return filename, subtitle_path, video_title
 
 def parse_srt(srt_path: str) -> List[Tuple[float, float, str]]:
     """

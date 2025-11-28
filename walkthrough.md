@@ -65,6 +65,23 @@ You can bypass the AI generation or provide your own source text using local fil
 ```bash
 python main.py "https://www.youtube.com/watch?v=..." --parody-file my_parody.txt
 ```
+
+### Customizing Metadata & Filenames
+You can control the output filename and metadata using the following arguments. If you don't provide a title, the AI will generate one for you.
+
+**Arguments:**
+-   `--author`: The name of the parody author (defaults to "AI").
+-   `--parody-title`: The title of your parody song.
+
+**Automatic Renaming:**
+The tool will automatically clean the original video title (removing "Official Video", etc.) and format the final filename as:
+`{{author}} - {{parody-title}} of {{orig_artist}} - {{orig-title}}.mp4`
+
+**Example:**
+```bash
+python main.py "https://www.youtube.com/watch?v=..." --topic "coffee" --author "JavaJim" --parody-title "Caffeine Addiction"
+# Output: JavaJim - Caffeine Addiction of Artist - Song.mp4
+```
 ## How it Works
 1.  **Download**: `yt-dlp` fetches the video and SRT subtitles.
 2.  **Audio**: `demucs` separates the vocals from the music.

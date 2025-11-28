@@ -55,7 +55,7 @@ def generate_parody(original_lyrics_lines: List[str], topic: str) -> List[str]:
     
     # Construct prompt
     prompt = f"Write a parody of the following song lyrics about the topic: '{topic}'.\n"
-    prompt += "Try to match the syllable count and rhythm of each line.\n\n"
+    prompt += "Try to match the syllable count and rhythm of each line.  Write parody lyrics that match the original song's exact rhythm, syllable count per line, rhyme scheme, meter, and phrasing/timing, so they fit seamlessly when sung to the same melody.\n\n"
     prompt += "Original Lyrics:\n"
     prompt += "\n".join(original_lyrics_lines)
     
